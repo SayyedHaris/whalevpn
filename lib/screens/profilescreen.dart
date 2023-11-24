@@ -15,9 +15,6 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
 
-
-
-
   final ImagePickerController _pickerController = Get.put(ImagePickerController());
 
   @override
@@ -58,8 +55,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                    // _getFromGallery(context);
                                    _pickerController.getImagefromCamera();
                                    Get.back();
-
-
                                    print("Camera Permission is granted");
 
                                  }else{
@@ -90,16 +85,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                          ],
                        ),
                        title: "Choose");
-
-                   if (await Permission.camera.request().isGranted) {
-                     // Either the permission was already granted before or the user just granted it.
-                     print("Camera Permission is granted");
-
-                   }else{
-                     await Permission.camera.request();
-                     print("Camera Permission is denied.");
-
-                   }
 
                  },
                    icon: const Icon(Icons.add,color: Colors.white),),

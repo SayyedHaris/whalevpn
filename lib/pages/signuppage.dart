@@ -17,7 +17,7 @@ class _SignUpPageState extends State<SignUpPage> {
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
   void _submitSignUpForm(){
     if (_formkey.currentState!.validate()) {
-      Get.to(const SignUpScreen());
+      Get.to(SignUpScreen());
     }  else{
       Get.snackbar("Sorry", "Fill the form properly");
     }
@@ -146,7 +146,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   }),
                   SizedBox(height: Get.height * .035,),
                   Padding(
-                    padding: const EdgeInsets.symmetric(
+                    padding: EdgeInsets.symmetric(
                         vertical: 30),
                     child: Stack(
                       children: [
@@ -162,7 +162,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                     borderRadius:
                                     BorderRadius.circular(
                                         20))),
-                            child: const Text(
+                            child: Text(
                               "Sign Up",
                               style: TextStyle(fontSize: 20),
                             )),
@@ -170,13 +170,13 @@ class _SignUpPageState extends State<SignUpPage> {
                           right: 20,
                           bottom: 12,
                           child: MaterialButton(
-                            shape: const StadiumBorder(),
+                            shape: StadiumBorder(),
                             minWidth: 20,
                             height: 40,
                             color: Colors.white70,
-                            child: const Icon(Icons.arrow_forward),
+                            child: Icon(Icons.arrow_forward),
                             onPressed: () {
-                              Get.to(const SignUpScreen());
+                              Get.to(SignUpScreen());
                             },
                           ),
                         )

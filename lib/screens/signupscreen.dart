@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:slide_to_act/slide_to_act.dart';
 import 'package:whale_vpn/screens/profilescreen.dart';
+import 'package:whale_vpn/screens/rowandcolumn.dart';
+import 'package:whale_vpn/troggleEye/troggleeye.dart';
 
 
 class SignUpScreen extends StatefulWidget {
@@ -12,7 +15,9 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  DateTime date = DateTime.now();
+
+  final TroggleEye _eye = Get.put(TroggleEye());
+
   RangeValues values = const RangeValues(0, 1);
   String groupValue = "Yes";
   bool isCheckedNo = false;
@@ -49,6 +54,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 title: const Text('Profile', style: TextStyle(fontSize: 18)),
                 onTap: () {
                   Get.to(const ProfileScreen());
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.table_rows_outlined),
+                title: const Text('Row and Column', style: TextStyle(fontSize: 18)),
+                onTap: () {
+                  Get.to(const RowandColumn());
                 },
               ),
             ],
@@ -254,24 +266,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     text: "Slide to unlock",
                     textStyle:
                         const TextStyle(fontSize: 18, color: Colors.white),
-                    onSubmit: () async {
-                      DateTime? newDate = await showDatePicker(
-                        context: context,
-                        initialDate: DateTime.now(),
-                        firstDate: DateTime(2000),
-                        lastDate: DateTime(2025),
-                      );
-
-                      if (newDate == null) {
-                        return null;
-                      }
-
-                      setState(() => date = newDate);
-
+                    onSubmit: ()  {
+                      _eye.chooseDate();
                     },
                   ),
                   padd,
-                  Text("${date.year}/${date.month}/${date.day}"),
+                  // Text("${date.year}/${date.month}/${date.day}"),
+                  Obx(() => Text(DateFormat("dd-MM-yyyy").format(_eye.selectedDate.value).toString()),),
 
                   const SizedBox(height: 25),
                   Row(

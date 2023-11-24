@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 
 import 'package:whale_vpn/pages/signuppage.dart';
 import 'package:whale_vpn/pages/verificationpage.dart';
-import 'package:whale_vpn/screens/loginscreen.dart';
+import 'package:whale_vpn/screens/rowandcolumn.dart';
 
 import '../troggleEye/troggleeye.dart';
 
@@ -21,7 +21,7 @@ class _TabBarPageState extends State<TabBarPage> {
 
   void _submitForm(){
     if (_formkey.currentState!.validate()) {
-      Get.to(const LoginScreen());
+      Get.to(const RowandColumn());
     }  else{
       Get.snackbar("Sorry", "Fill the form properly");
     }

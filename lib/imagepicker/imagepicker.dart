@@ -25,3 +25,7 @@ class ImagePickerController extends GetxController {
     }
   }
 }
+
+
+
+
