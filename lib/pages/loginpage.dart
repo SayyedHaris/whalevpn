@@ -1,27 +1,59 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:whale_vpn/apis/apimodel.dart';
+import 'package:whale_vpn/helper/helper.dart';
+import 'package:whale_vpn/pages/authservice.dart';
+import 'package:whale_vpn/pages/emailandpassword.dart';
+import 'package:whale_vpn/pages/homepage.dart';
 
 import 'package:whale_vpn/pages/signuppage.dart';
+
 import 'package:whale_vpn/pages/verificationpage.dart';
 import 'package:whale_vpn/screens/rowandcolumn.dart';
 
 import '../troggleEye/troggleeye.dart';
 
-class TabBarPage extends StatefulWidget {
-  const TabBarPage({Key? key}) : super(key: key);
+class LoginPage extends StatefulWidget {
+  const LoginPage({Key? key}) : super(key: key);
 
   @override
-  State<TabBarPage> createState() => _TabBarPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class _TabBarPageState extends State<TabBarPage> {
+class _LoginPageState extends State<LoginPage> {
+
+final emailController = TextEditingController();
+final passController = TextEditingController();
+
+
+
+
+
+
+void signUserIn()async {
+  try{
+    await FirebaseAuth.instance.signInWithEmailAndPassword(email: emailController.text, password: passController.text);
+    print("Successfull");
+    Get.to(HomePage());
+
+  }catch(e){
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Enter correct Details")));
+    print(e);
+  }
+}
+
+
+
 
   final TroggleEye _eye = Get.put(TroggleEye());
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
 
   void _submitForm(){
     if (_formkey.currentState!.validate()) {
-      Get.to(const RowandColumn());
+      print("harry");
+      Get.to(HomePage());
     }  else{
       Get.snackbar("Sorry", "Fill the form properly");
     }
@@ -132,6 +164,7 @@ class _TabBarPageState extends State<TabBarPage> {
                               child: Column(
                                 children: [
                                   TextFormField(
+
                                     validator: (value) {
                                       if (value!.isEmpty) {
                                         return "Please enter email";
@@ -142,6 +175,7 @@ class _TabBarPageState extends State<TabBarPage> {
                                         return "Please provide valid email";
                                       }
                                     },
+                                    controller: emailController,
                                     decoration: InputDecoration(
                                       disabledBorder: const OutlineInputBorder(),
                                       focusedBorder: OutlineInputBorder(
@@ -176,6 +210,7 @@ class _TabBarPageState extends State<TabBarPage> {
                                           return "Password must contain 5 characters";
                                         }
                                       },
+                                      controller: passController,
                                       decoration: InputDecoration(
                                         disabledBorder: const OutlineInputBorder(),
                                         focusedBorder: OutlineInputBorder(
@@ -226,14 +261,53 @@ class _TabBarPageState extends State<TabBarPage> {
                                       ),
                                     ),
                                   ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+
+                                          ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Colors.white,
+                                                  shape: const StadiumBorder()),
+                                              onPressed: () async {
+
+
+                                                Apis().handleGoogleButtonClick();
+                                                Helper.saveUserData(true);
+
+
+                                            // AuthService().signInWithGoogle();
+
+
+                                          }, child: Row(
+                                            children: [
+                                             Container(
+                                               child: Image.asset("assets/images/google.png"),
+                                               height: 40,width: 40,),
+                                              const Text("Login with Google",style: TextStyle(color: Colors.black),),
+                                            ],
+                                          ))
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8,),
+                                  const Row(
+                                    children: [
+                                      Expanded(child: Divider(thickness: 2,)),
+                                      Text("  Or try with  "),
+                                      Expanded(child: Divider(thickness: 2,))
+                                    ],
+                                  ),
                                   Padding(
                                     padding: const EdgeInsets.symmetric(
-                                        vertical: 30),
+                                        vertical: 17),
                                     child: Stack(
                                       children: [
                                         ElevatedButton(
-                                            onPressed: () {
-                                            _submitForm();
+                                            onPressed: () async {
+                                              signUserIn();
+                                            Helper.saveUserData(true);
+
+                                            // _submitForm();
                                             },
                                             style: ElevatedButton.styleFrom(
                                                 minimumSize: Size(
@@ -260,10 +334,11 @@ class _TabBarPageState extends State<TabBarPage> {
                                               _submitForm();
                                             },
                                           ),
-                                        )
+                                        ),
                                       ],
                                     ),
-                                  )
+                                  ),
+
                                 ],
                               ),
                             ),

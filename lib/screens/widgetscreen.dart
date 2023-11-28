@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:slide_to_act/slide_to_act.dart';
 import 'package:whale_vpn/screens/profilescreen.dart';
+import 'package:whale_vpn/screens/rowandcolumn.dart';
+import 'package:whale_vpn/troggleEye/troggleeye.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 class SignUpScreen extends StatefulWidget {
@@ -12,12 +16,43 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  DateTime date = DateTime.now();
-  RangeValues values = const RangeValues(0, 1);
+
+  final TroggleEye _eye = Get.put(TroggleEye());
+
+  late SharedPreferences prefs;
+
+
+  RangeValues values = const RangeValues(0.0, 150.0);
+
   String groupValue = "Yes";
   bool isCheckedNo = false;
   bool isCheckedYes = false;
   String dropDownvalue = 'One';
+  String popUpMenu = 'One';
+
+
+  void initState() {
+    super.initState();
+    loadSliderValues();
+  }
+
+  // DateTime date = DateTime.now();
+  Future<void> saveSliderValues() async {
+    await prefs.setDouble('startValue', values.start);
+    await prefs.setDouble('endValue', values.end);
+  }
+
+
+
+  Future<void> loadSliderValues() async {
+    prefs = await SharedPreferences.getInstance();
+    final double startValue = prefs.getDouble('startValue') ?? 0.0;
+    final double endValue = prefs.getDouble('endValue') ?? 100.0;
+
+    setState(() {
+      values = RangeValues(startValue, endValue);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,6 +84,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 title: const Text('Profile', style: TextStyle(fontSize: 18)),
                 onTap: () {
                   Get.to(const ProfileScreen());
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.radar),
+                title: const Text('Row and Column', style: TextStyle(fontSize: 18)),
+                onTap: () {
+                  Get.to(const RowandColumn());
                 },
               ),
             ],
@@ -125,9 +167,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         width: 175,
                         height: 40,
                         child: RangeSlider(
+                          labels: labels,
+                          divisions: 10,
+                          min: 0.0,
+                          max: 150,
                           values: values,
                           onChanged: (value) {
                             values = value;
+                            saveSliderValues();
 
                             setState(() {});
                           },
@@ -237,10 +284,34 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         onPressed: () {},
                       ),
                       PopupMenuButton(
+
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+
+                            Text("${popUpMenu}"),
+                            SizedBox(width: 3,),
+
+                            Icon(Icons.arrow_drop_down_circle_rounded),
+
+                          ],
+                        ),
+                        onSelected: (value) {
+                          popUpMenu = value;
+                          setState(() {
+                            print("Selected ${popUpMenu}");
+                          });
+                        },
                         itemBuilder: (context) => [
-                          const PopupMenuItem(child: Text("Option One")),
-                          const PopupMenuItem(child: Text("Option Two")),
-                          const PopupMenuItem(child: Text("Option Three")),
+                          const PopupMenuItem(
+                              value: 'One',
+                              child: Text("Option One")),
+                          const PopupMenuItem(
+                              value: 'Two',
+                              child: Text("Option Two")),
+                          const PopupMenuItem(
+                              value: 'Three',
+                              child: Text("Option Three")),
                         ],
                       ),
                     ],
@@ -254,24 +325,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     text: "Slide to unlock",
                     textStyle:
                         const TextStyle(fontSize: 18, color: Colors.white),
-                    onSubmit: () async {
-                      DateTime? newDate = await showDatePicker(
-                        context: context,
-                        initialDate: DateTime.now(),
-                        firstDate: DateTime(2000),
-                        lastDate: DateTime(2025),
-                      );
+                    onSubmit: ()  {
 
-                      if (newDate == null) {
-                        return null;
-                      }
+                        _eye.chooseDate();
+                      // DateTime? newDate = await showDatePicker(
+                      //   context: context,
+                      //   initialDate: DateTime.now(),
+                      //   firstDate: DateTime(2000),
+                      //   lastDate: DateTime(2025),
+                      // );
 
-                      setState(() => date = newDate);
+                      // if (newDate == null) {
+                      //   return null;
+                      // }
+
+                      // setState(() => date = newDate);
 
                     },
                   ),
                   padd,
-                  Text("${date.year}/${date.month}/${date.day}"),
+                  Obx(() => Text(DateFormat('dd-MM-yyyy').format(_eye.selectedDate.value).toString())),
+                  // Text("${date.year}/${date.month}/${date.day}"),
 
                   const SizedBox(height: 25),
                   Row(

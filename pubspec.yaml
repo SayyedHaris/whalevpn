@@ -41,7 +41,17 @@ dependencies:
   image_picker: ^1.0.4
   permission_handler:
   slide_to_act:
-  table_calendar:
+  marquee: ^2.2.3
+  google_nav_bar: ^5.0.6
+  intl:
+  fluttertoast:
+  google_sign_in:
+  firebase_core:
+  firebase_auth:
+  shared_preferences: ^2.2.2
+  cloud_firestore:
+  firebase_messaging:
+
 
 dev_dependencies:
   flutter_test:

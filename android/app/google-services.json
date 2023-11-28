@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "509085497788",
+    "project_id": "whale-vpn-c4610",
+    "storage_bucket": "whale-vpn-c4610.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:509085497788:android:b78f58c46407e45e9713b9",
+        "android_client_info": {
+          "package_name": "com.example.whale_vpn"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCJoW8Uprs8QdyHywgxxAT8yj6IQ6QGsWg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

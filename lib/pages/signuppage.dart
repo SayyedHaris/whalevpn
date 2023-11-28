@@ -1,7 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:whale_vpn/screens/signupscreen.dart';
+import 'package:whale_vpn/screens/widgetscreen.dart';
 import 'package:whale_vpn/troggleEye/troggleeye.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key? key}) : super(key: key);
@@ -17,11 +19,56 @@ class _SignUpPageState extends State<SignUpPage> {
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
   void _submitSignUpForm(){
     if (_formkey.currentState!.validate()) {
-      Get.to(SignUpScreen());
+      signUserUp();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Account Created Successfully")));
+      // Get.to(const SignUpScreen());
     }  else{
       Get.snackbar("Sorry", "Fill the form properly");
     }
   }
+
+
+  final TextEditingController _fullNamecontroller = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passController = TextEditingController();
+
+  
+
+  void signUserUp() async {
+    showDialog(context: context, builder: (context) {
+      return const Center(child: CircularProgressIndicator(),);
+    },);
+
+    try{
+
+     await FirebaseAuth.instance.createUserWithEmailAndPassword(email:_emailController.text, password: _passController.text);
+
+     addUserDetails(
+       _fullNamecontroller.text,
+       _emailController.text,
+         _passController.text
+     );
+
+     Navigator.pop(context);
+
+    }
+
+    on FirebaseAuthException catch(e){
+
+      Navigator.pop(context);
+
+      print(e);
+    }
+  }
+  Future addUserDetails(String fullname, String email, String password) async {
+  await FirebaseFirestore.instance.collection("users").add({
+    'Full Name' : fullname,
+    'Email' : email,
+    "Password" : password
+  });
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return  Scaffold(
@@ -37,20 +84,21 @@ class _SignUpPageState extends State<SignUpPage> {
               child: Column(
                 children: [
                   TextFormField(
+
                     validator: (value) {
                     if (value!.isEmpty) {
                         return "Enter name";
                     }else if (value!.length <=5) {
                          return "Letters must contain 5 characters";
                      }
-                    },
+                    },controller: _fullNamecontroller,
                     decoration: InputDecoration(
                       disabledBorder: const OutlineInputBorder(),
                       focusedBorder: OutlineInputBorder(
                           borderRadius:
                           BorderRadius.circular(30)),
                       prefixIcon: const Icon(
-                          Icons.alternate_email,
+                          Icons.person,
                           size: 25,
                           color: Colors.grey),
                       labelText: "Full name",
@@ -69,13 +117,14 @@ class _SignUpPageState extends State<SignUpPage> {
                     height: 25,
                   ),
                   TextFormField(
+                    controller: _emailController,
                     decoration: InputDecoration(
                       disabledBorder: const OutlineInputBorder(),
                       focusedBorder: OutlineInputBorder(
                           borderRadius:
                           BorderRadius.circular(30)),
                       prefixIcon: const Icon(
-                          Icons.password_outlined,
+                          Icons.alternate_email,
                           size: 25,
                           color: Colors.grey),
                       labelText: "Enter email address",
@@ -105,6 +154,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
                   Obx(() {
                     return TextFormField(
+                      controller: _passController,
                       obscureText: !_eye.isVisible.value,
                       validator: (value) {
                         if (value!.isEmpty) {
@@ -146,7 +196,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   }),
                   SizedBox(height: Get.height * .035,),
                   Padding(
-                    padding: EdgeInsets.symmetric(
+                    padding: const EdgeInsets.symmetric(
                         vertical: 30),
                     child: Stack(
                       children: [
@@ -162,7 +212,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                     borderRadius:
                                     BorderRadius.circular(
                                         20))),
-                            child: Text(
+                            child: const Text(
                               "Sign Up",
                               style: TextStyle(fontSize: 20),
                             )),
@@ -170,13 +220,13 @@ class _SignUpPageState extends State<SignUpPage> {
                           right: 20,
                           bottom: 12,
                           child: MaterialButton(
-                            shape: StadiumBorder(),
+                            shape: const StadiumBorder(),
                             minWidth: 20,
                             height: 40,
                             color: Colors.white70,
-                            child: Icon(Icons.arrow_forward),
+                            child: const Icon(Icons.arrow_forward),
                             onPressed: () {
-                              Get.to(SignUpScreen());
+                              Get.to(const SignUpScreen());
                             },
                           ),
                         )
