@@ -33,7 +33,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<Timer> loadData() async {
-    return Timer(const Duration(seconds: 3), onDoneLoading);
+    return Timer(const Duration(milliseconds: 500), onDoneLoading);
   }
 
   onDoneLoading() async {
@@ -54,8 +54,14 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(child: Text("Splash Screen")),
+    return Scaffold(
+
+      body: Center(child: Container(decoration: BoxDecoration(borderRadius: BorderRadius.circular(60)),
+        child: CircleAvatar(
+          
+          radius: 150,
+          child: Image.asset("assets/images/whalesp.png"),),
+      )),
     );
   }
 }

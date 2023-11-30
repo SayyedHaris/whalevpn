@@ -16,6 +16,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
+
+
   final user = FirebaseAuth.instance.currentUser;
 
   final photo = FirebaseAuth.instance.currentUser!.photoURL;
@@ -24,7 +27,8 @@ class _HomePageState extends State<HomePage> {
     if (FirebaseAuth.instance.currentUser != null) {
       AuthService().disconnectWithGoogle();
       await FirebaseAuth.instance.signOut();
-      Get.to(LoginPage());
+      await Helper.rmClean();
+      Get.to(const LoginPage());
     }
   }
 
@@ -38,8 +42,6 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
               onPressed: () async {
-                Helper.saveUserData(false);
-                Helper.rmClean();
                 signUserOut();
 
               },

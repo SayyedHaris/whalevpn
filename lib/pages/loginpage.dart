@@ -32,15 +32,17 @@ final passController = TextEditingController();
 
 
 
-void signUserIn()async {
+Future signUserIn()async {
   try{
     await FirebaseAuth.instance.signInWithEmailAndPassword(email: emailController.text, password: passController.text);
     print("Successfull");
-    Get.to(HomePage());
+    // Get.to(HomePage());
 
   }catch(e){
+
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Enter correct Details")));
     print(e);
+    rethrow;
   }
 }
 
@@ -50,19 +52,31 @@ void signUserIn()async {
   final TroggleEye _eye = Get.put(TroggleEye());
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
 
-  void _submitForm(){
+  Future<void> _submitForm() async {
     if (_formkey.currentState!.validate()) {
-      print("harry");
-      Get.to(HomePage());
-    }  else{
+
+      try{
+        await signUserIn();
+        Get.to(HomePage());
+      }
+      catch(e){
+        Get.snackbar("Sorry", "An error occurred during login");
+      }
+    }else{
       Get.snackbar("Sorry", "Fill the form properly");
     }
+    //   print("harry");
+    //   Get.to(HomePage());
+    // }  else{
+    //   Get.snackbar("Sorry", "Fill the form properly");
+    // }
   }
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
+
         body: SingleChildScrollView(
           child: Center(
             child: Form(
@@ -128,26 +142,30 @@ void signUserIn()async {
                   ),
                   Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Colors.blue.shade800,
                       borderRadius: BorderRadius.circular(40),
                     ),
                     height: Get.height * .08,
                     width: Get.width * .9,
-                    child: TabBar(
+                    child: TabBar(unselectedLabelStyle: TextStyle(fontSize: 10),
                       indicator: BoxDecoration(
                         borderRadius: BorderRadius.circular(
                           30.0,
                         ),
-                        color: Colors.blue.shade800,
+                        // color: Colors.white,
                       ),
                       labelColor: Colors.white,
+                      // overlayColor: MaterialStatePropertyAll(Colors.blue),
+                      dividerColor: Colors.transparent,
+                      automaticIndicatorColorAdjustment: false,
+                      indicatorColor: Colors.white,
                       unselectedLabelColor: Colors.grey.shade900,
                       tabs: const [
                         Tab(
-                          child: Text("Log In", style: TextStyle(fontSize: 19)),
+                          child: Text("Log In", style: TextStyle(fontSize: 22)),
                         ),
                         Tab(
-                          child: Text("Sign Up", style: TextStyle(fontSize: 19)),
+                          child: Text("Sign Up", style: TextStyle(fontSize: 22)),
                         ),
                       ],
                     ),
@@ -249,7 +267,7 @@ void signUserIn()async {
                                       alignment: Alignment.centerLeft,
                                       child: TextButton(
                                         onPressed: () {
-                                          Get.to(const VerificationPage());
+                                          Get.to(const VerificationPage(VerificationId: "",));
                                         },
                                         child: const Text(
                                           "Forget your password?",
@@ -304,12 +322,12 @@ void signUserIn()async {
                                       children: [
                                         ElevatedButton(
                                             onPressed: () async {
-                                              signUserIn();
-                                            Helper.saveUserData(true);
+                                              // signUserIn();
+                                            // Helper.saveUserData(true);
 
-                                            // _submitForm();
+                                             _submitForm();
                                             },
-                                            style: ElevatedButton.styleFrom(
+                                            style: ElevatedButton.styleFrom(backgroundColor: Colors.blue.shade800,
                                                 minimumSize: Size(
                                                     Get.width,
                                                     Get.height * .075),
@@ -319,7 +337,7 @@ void signUserIn()async {
                                                         20))),
                                             child: const Text(
                                               "Log in",
-                                              style: TextStyle(fontSize: 20),
+                                              style: TextStyle(fontSize: 20, color: Colors.white),
                                             )),
                                         Positioned(
                                           right: 20,

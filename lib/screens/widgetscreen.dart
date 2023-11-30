@@ -1,4 +1,6 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:slide_to_act/slide_to_act.dart';
@@ -6,6 +8,8 @@ import 'package:whale_vpn/screens/profilescreen.dart';
 import 'package:whale_vpn/screens/rowandcolumn.dart';
 import 'package:whale_vpn/troggleEye/troggleeye.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../main.dart';
 
 
 class SignUpScreen extends StatefulWidget {
@@ -16,6 +20,13 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+
+
+
+
+
+
+
 
   final TroggleEye _eye = Get.put(TroggleEye());
 
@@ -34,6 +45,62 @@ class _SignUpScreenState extends State<SignUpScreen> {
   void initState() {
     super.initState();
     loadSliderValues();
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      RemoteNotification? notification = message.notification;
+      AndroidNotification? android = message.notification?.android;
+
+      if (notification != null && android != null) {
+        flutterLocalNotificationsPlugin.show(
+            notification.hashCode,
+            notification.title,
+            notification.body,
+            NotificationDetails(
+                android: AndroidNotificationDetails(channel.id, channel.name,
+                    channelDescription: channel.description,playSound: true, icon: "@mipmap/ic_launcher")));
+      }
+    });
+
+    FirebaseMessaging.onMessageOpenedApp.listen((message) {
+      RemoteNotification? notification = message.notification;
+      AndroidNotification? andriod = message.notification?.android;
+      if (notification != null && andriod != null) {
+        showDialog(context: context, builder:(context) {
+          return AlertDialog(
+            content: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Text(notification.body.toString())
+                ],
+              ),
+            ),
+            title: Text(notification.title.toString(),
+
+            ),);
+
+        }, );
+      }
+    });
+
+
+
+  }
+
+  void showNotification(){
+    //
+    flutterLocalNotificationsPlugin.show(0,
+        "Testing",
+        "How you doing",
+        NotificationDetails(android: AndroidNotificationDetails(
+            channel.id,
+            channel.name,
+            channelDescription: channel.description,
+            importance: Importance.high,
+            color: Colors.blue,
+            playSound: true,
+            icon: "@mipmap/ic_launcher"
+
+        )));
   }
 
   // DateTime date = DateTime.now();
@@ -61,7 +128,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-        appBar: AppBar(title: const Text("Widgets")),
+        appBar: AppBar(
+
+            title: const Text("Widgets",style: TextStyle(color: Colors.white),)),
         drawer: Drawer(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
@@ -122,8 +191,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ElevatedButton(
                           style: ElevatedButton.styleFrom(
                               minimumSize: const Size(180, 50)),
-                          onPressed: () {},
-                          child: const Text("Elevated Button")),
+                          onPressed: () {
+
+                            showNotification();
+
+
+                          },
+                          child: const Text("Push Notification Button")),
                       TextButton(
                           onPressed: () {},
                           child: const Text(
@@ -320,6 +394,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     height: 30,
                   ),
                   SlideAction(
+                    outerColor: Colors.blue,
                     sliderButtonIcon: const Icon(Icons.lock_open),
                     sliderRotate: false,
                     text: "Slide to unlock",

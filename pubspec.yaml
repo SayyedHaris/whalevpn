@@ -51,12 +51,16 @@ dependencies:
   shared_preferences: ^2.2.2
   cloud_firestore:
   firebase_messaging:
+  flutter_local_notifications: ^16.2.0
+  app_settings:
+  intl_phone_field: ^3.2.0
+  flutter_countdown_timer: ^4.1.0
 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
+  firebase_analytics: ^10.7.2
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your

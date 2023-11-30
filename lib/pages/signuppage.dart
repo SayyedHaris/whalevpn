@@ -13,145 +13,147 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
-
   final TroggleEye _eye = Get.put(TroggleEye());
 
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
-  void _submitSignUpForm(){
+  Future<void> _submitSignUpForm() async {
     if (_formkey.currentState!.validate()) {
-      signUserUp();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Account Created Successfully")));
+      bool userExist = await checkifuserexist(_emailController.text);
+      if (userExist) {
+        Get.snackbar("Error!", "User Already Exists",snackPosition: SnackPosition.BOTTOM);
+      } else {
+        signUserUp();
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Account Created Successfully")));
+      }
+
       // Get.to(const SignUpScreen());
-    }  else{
+    } else {
       Get.snackbar("Sorry", "Fill the form properly");
     }
   }
-
 
   final TextEditingController _fullNamecontroller = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
 
-  
+  Future<bool> checkifuserexist(String email) async {
+    try {
+      var result = await FirebaseFirestore.instance
+          .collection("users")
+          .where("Email", isEqualTo: email)
+          .get();
 
-  void signUserUp() async {
-    showDialog(context: context, builder: (context) {
-      return const Center(child: CircularProgressIndicator(),);
-    },);
-
-    try{
-
-     await FirebaseAuth.instance.createUserWithEmailAndPassword(email:_emailController.text, password: _passController.text);
-
-     addUserDetails(
-       _fullNamecontroller.text,
-       _emailController.text,
-         _passController.text
-     );
-
-     Navigator.pop(context);
-
+      return result.docs.isNotEmpty;
+    } catch (e) {
+      print(e);
+      return false;
     }
+  }
 
-    on FirebaseAuthException catch(e){
+  Future signUserUp() async {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
 
+    try {
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: _emailController.text, password: _passController.text);
+
+      addUserDetails(_fullNamecontroller.text, _emailController.text,
+          _passController.text);
+
+      Navigator.pop(context);
+    } on FirebaseAuthException catch (e) {
       Navigator.pop(context);
 
       print(e);
     }
   }
-  Future addUserDetails(String fullname, String email, String password) async {
-  await FirebaseFirestore.instance.collection("users").add({
-    'Full Name' : fullname,
-    'Email' : email,
-    "Password" : password
-  });
-  }
 
+  Future addUserDetails(String fullname, String email, String password) async {
+    await FirebaseFirestore.instance
+        .collection("users")
+        .add({'Full Name': fullname, 'Email': email, "Password": password});
+  }
 
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
+    return Scaffold(
       body: Form(
         key: _formkey,
-        child: ListView(keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+        child: ListView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           children: [
             Padding(
-              padding:  EdgeInsets.symmetric(
-
-                horizontal: Get.width * .06
-              ),
+              padding: EdgeInsets.symmetric(horizontal: Get.width * .06),
               child: Column(
                 children: [
                   TextFormField(
-
                     validator: (value) {
-                    if (value!.isEmpty) {
+                      if (value!.isEmpty) {
                         return "Enter name";
-                    }else if (value!.length <=5) {
-                         return "Letters must contain 5 characters";
-                     }
-                    },controller: _fullNamecontroller,
+                      } else if (value!.length <= 5) {
+                        return "Letters must contain 5 characters";
+                      }
+                    },
+                    controller: _fullNamecontroller,
                     decoration: InputDecoration(
                       disabledBorder: const OutlineInputBorder(),
                       focusedBorder: OutlineInputBorder(
-                          borderRadius:
-                          BorderRadius.circular(30)),
-                      prefixIcon: const Icon(
-                          Icons.person,
-                          size: 25,
-                          color: Colors.grey),
+                          borderRadius: BorderRadius.circular(30)),
+                      prefixIcon: const Icon(Icons.person,
+                          size: 25, color: Colors.grey),
                       labelText: "Full name",
-                      labelStyle:
-                      const TextStyle(color: Colors.black),
+                      labelStyle: const TextStyle(color: Colors.black),
                       hintText: "Enter full name",
                       contentPadding: const EdgeInsets.symmetric(
                         vertical: 25,
                       ),
                       border: OutlineInputBorder(
-                          borderRadius:
-                          BorderRadius.circular(30)),
+                          borderRadius: BorderRadius.circular(30)),
                     ),
                   ),
                   const SizedBox(
                     height: 25,
                   ),
                   TextFormField(
-                    controller: _emailController,
-                    decoration: InputDecoration(
-                      disabledBorder: const OutlineInputBorder(),
-                      focusedBorder: OutlineInputBorder(
-                          borderRadius:
-                          BorderRadius.circular(30)),
-                      prefixIcon: const Icon(
-                          Icons.alternate_email,
-                          size: 25,
-                          color: Colors.grey),
-                      labelText: "Enter email address",
-                      labelStyle:
-                      const TextStyle(color: Colors.black),
-                      hintText: "Enter email address",
-
-                      contentPadding: const EdgeInsets.symmetric(
-                        vertical: 25,
+                      controller: _emailController,
+                      decoration: InputDecoration(
+                        disabledBorder: const OutlineInputBorder(),
+                        focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30)),
+                        prefixIcon: const Icon(Icons.alternate_email,
+                            size: 25, color: Colors.grey),
+                        labelText: "Enter email address",
+                        labelStyle: const TextStyle(color: Colors.black),
+                        hintText: "Enter email address",
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 25,
+                        ),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30)),
                       ),
-                      border: OutlineInputBorder(
-                          borderRadius:
-                          BorderRadius.circular(30)),
-                    ),
-                    validator: (value) { {
-                      if (value!.isEmpty) {
-                       return "Please enter email";
-                      }
-                            RegExp emailReg = RegExp(
-                            r'^[\w-\.]+@([\w-]+\.)+[\w]{2,4}');
-                              if (!emailReg.hasMatch(value)) {
-                    return "Please provide valid email";
-                      }
-                    }
-                  }),
-                  SizedBox(height: Get.height * .03,),
-
+                      validator: (value) {
+                        {
+                          if (value!.isEmpty) {
+                            return "Please enter email";
+                          }
+                          RegExp emailReg =
+                              RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w]{2,4}');
+                          if (!emailReg.hasMatch(value)) {
+                            return "Please provide valid email";
+                          }
+                        }
+                      }),
+                  SizedBox(
+                    height: Get.height * .03,
+                  ),
                   Obx(() {
                     return TextFormField(
                       controller: _passController,
@@ -166,55 +168,48 @@ class _SignUpPageState extends State<SignUpPage> {
                       decoration: InputDecoration(
                         disabledBorder: const OutlineInputBorder(),
                         focusedBorder: OutlineInputBorder(
-                            borderRadius:
-                            BorderRadius.circular(30)),
-
-                        prefixIcon: const Icon(
-                            Icons.password_outlined,
-                            size: 25,
-                            color: Colors.grey),
+                            borderRadius: BorderRadius.circular(30)),
+                        prefixIcon: const Icon(Icons.password_outlined,
+                            size: 25, color: Colors.grey),
                         labelText: "Password",
-                        labelStyle:
-                        const TextStyle(color: Colors.black),
+                        labelStyle: const TextStyle(color: Colors.black),
                         hintText: "Enter password",
                         suffixIcon: Obx(() {
                           return IconButton(
                             onPressed: () {
                               _eye.TroggleSwitch();
                             },
-                            icon: Icon(_eye.isVisible.value ? Icons.visibility : Icons.visibility_off),
+                            icon: Icon(_eye.isVisible.value
+                                ? Icons.visibility
+                                : Icons.visibility_off),
                           );
                         }),
                         contentPadding: const EdgeInsets.symmetric(
                           vertical: 25,
                         ),
                         border: OutlineInputBorder(
-                            borderRadius:
-                            BorderRadius.circular(30)),
+                            borderRadius: BorderRadius.circular(30)),
                       ),
                     );
                   }),
-                  SizedBox(height: Get.height * .035,),
+                  SizedBox(
+                    height: Get.height * .035,
+                  ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 30),
+                    padding: const EdgeInsets.symmetric(vertical: 30),
                     child: Stack(
                       children: [
                         ElevatedButton(
                             onPressed: () {
                               _submitSignUpForm();
                             },
-                            style: ElevatedButton.styleFrom(
-                                minimumSize: Size(
-                                    Get.width,
-                                    Get.height * .075),
+                            style: ElevatedButton.styleFrom(backgroundColor: Colors.blue.shade800,
+                                minimumSize: Size(Get.width, Get.height * .075),
                                 shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                    BorderRadius.circular(
-                                        20))),
+                                    borderRadius: BorderRadius.circular(20))),
                             child: const Text(
                               "Sign Up",
-                              style: TextStyle(fontSize: 20),
+                              style: TextStyle(fontSize: 20, color: Colors.white),
                             )),
                         Positioned(
                           right: 20,
@@ -233,7 +228,6 @@ class _SignUpPageState extends State<SignUpPage> {
                       ],
                     ),
                   ),
-
                 ],
               ),
             ),
